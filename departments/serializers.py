@@ -2,6 +2,7 @@ import datetime
 
 from rest_framework import serializers
 from . import models
+from django.db.models import Count
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -16,6 +17,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
             if employee.department == department:
                 count += 1
         return count
+
 
     def get_retired_employees(self, department):
         retired_employee_names = []
