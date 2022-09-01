@@ -11,12 +11,15 @@ class DepartmentSerializer(serializers.ModelSerializer):
     average_salary = serializers.SerializerMethodField()
 
     def get_num_of_employees(self, department):
-        count = 0
+        count = models.Employee.objects.filter(department=department).aggregate(cnt=Count('name'))
+
+        return count['cnt']
+        '''count = 0
         employees = models.Employee.objects.all()
         for employee in employees:
             if employee.department == department:
                 count += 1
-        return count
+        return count'''
 
 
     def get_retired_employees(self, department):
