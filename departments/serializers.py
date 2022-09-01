@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework import serializers
 from . import models
-from django.db.models import Count
+from django.db.models import Count,Avg
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -23,7 +23,11 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
     def get_retired_employees(self, department):
-        retired_employee_names = []
+        d = datetime.datetime.now() - datetime.timedelta(days=60*365)
+        retired_emp = models.Employee.objects.values_list('name',flat=True).filter(department=department,date_of_birth__lte=d)
+        return list(retired_emp)
+        #return ['Hello']
+        '''retired_employee_names = []
         employees = models.Employee.objects.all()
         for employee in employees:
             if employee.department != department:
@@ -32,10 +36,12 @@ class DepartmentSerializer(serializers.ModelSerializer):
             # Employee is retired if their year of birth + 60 is less than current year.
             if employee.date_of_birth.year + 60 < datetime.date.today().year:
                 retired_employee_names.append(employee.name)
-        return retired_employee_names
+        return retired_employee_names'''
 
     def get_average_salary(self, department):
-        counter = 0
+        avg_sal = models.Employee.objects.filter(department=department).aggregate(average_salary=Avg('salary'))
+        return avg_sal['average_salary']
+        '''counter = 0
         total_salary = 0
         employees = models.Employee.objects.all()
         for employee in employees:
@@ -44,7 +50,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
                 total_salary += employee.salary
         if counter == 0:
             return 0
-        return total_salary / counter
+        return total_salary / counter'''
 
 
     class Meta:
